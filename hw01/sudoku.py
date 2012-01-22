@@ -6,6 +6,7 @@ class SudokuBoard:
     def __init__(self, inFile):
         self.board = self.parseBoard(inFile)
         self.constraints = self.computeConstraintsSets()
+        self.pointDict = self.computePointDict()
         
     def parseBoard(self, inFile):
         f = open(inFile, 'r')
@@ -31,3 +32,7 @@ class SudokuBoard:
         grid = [(i, j) for i in [0,1,2] for j in [0,1,2]]
         boxConstraints = [set([(3 * i + di, 3 * j + dj) for (di,dj) in grid]) for (i,j) in grid]
         return rowConstraints + colConstraints + boxConstraints
+
+    def computePointDict(self):
+      grid = [(i,j) for i in range(0,9) for j in range(0,9)]
+      return {(i,j): filter((lambda x: (i,j) in x), self.constraints) for (i,j) in grid}
