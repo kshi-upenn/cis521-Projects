@@ -6,7 +6,7 @@ class SudokuBoard:
         self.constraints = computeConstraintsSets()
         
     def parseBoard(self, inFile):
-        return [[int(symbol) for symbol in line if symbol=='*' symbol = 0] for line in inFile]
+        return [[int(symbol) if symbol!='*' else 0 for symbol in line] for line in inFile]
 
     def printBoard(self):
         for i in range(length(self.board)):
@@ -18,11 +18,11 @@ class SudokuBoard:
                     result + '*'
                 else:
                     result + list[j]
-                if j==2 || j==5:
+                if j==2 or j==5:
                    result + "|"
 
             print result
-            if i==2 || i==5:
+            if i==2 or i==5:
                 print '------+------+------'
 
     def computeConstraintsSets(self):
