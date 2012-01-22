@@ -25,11 +25,9 @@ class SudokuBoard:
                 print '---+---+---'
 
     def computeConstraintsSets(self):
-        constraints = []
-        for i in range(len(self.board)):
-            tempList = self.board[i]
+        rowConstraints = [set([(i,j) for j in range(0,9)]) for i in range(0,9)]
+        colConstraints = [set([(j,i) for j in range(0,9)]) for i in range(0,9)]
 
-            for j in range(len(tempList)):
-                constraints.append(set([ ]))
-        # Not finished...
-        return constraints
+        grid = [(i, j) for i in [0,1,2] for j in [0,1,2]]
+        boxConstraints = [set([(3 * i + di, 3 * j + dj) for (di,dj) in grid]) for (i,j) in grid]
+        return rowConstraints + colConstraints + boxConstraints
