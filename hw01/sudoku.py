@@ -17,13 +17,13 @@ class SudokuBoard:
 
     def printBoard(self):
         star = lambda x: str(x) if x != 0 else "*"
-        box = lambda x: string.join([str(c) for c in x],'')
+        box = lambda x: string.join([str(c) for c in x],' ')
         for i in range(len(self.board)):
             result = [star(c) for c in self.board[i]]
-            result = box(result[:3]) + "|" + box(result[3:6]) + "|" + box(result[-3:])
+            result = box(result[:3]) + "  |  " + box(result[3:6]) + "  |  " + box(result[-3:])
             print result
             if i==2 or i==5:
-                print '---+---+---'
+                print '-------+---------+-------'
 
     def computeConstraintsSets(self):
         rowConstraints = [set([(i,j) for j in range(0,9)]) for i in range(0,9)]
@@ -36,3 +36,13 @@ class SudokuBoard:
     def computePointDict(self):
       grid = [(i,j) for i in range(0,9) for j in range(0,9)]
       return {(i,j): filter((lambda x: (i,j) in x), self.constraints) for (i,j) in grid}
+
+    def computeUnusedNums(self, locations):
+      return set(range(0,10)) - set([self.board[i][j] for (i,j) in locations])
+
+    def isSolved(self):
+      f = lambda x:set([self.board[i][j] for (i,j) in x]) == set(range(1,10))
+      return reduce(lambda x,y: x and y, map(f, self.constraints), True)
+
+    def getConstraintSets(self,point):
+      return self.pointDict[point]
