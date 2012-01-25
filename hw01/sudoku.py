@@ -1,7 +1,12 @@
 #!/usr/bin/python
 #Program for solving Sudoku
 
+#Written by:
+#  Sam Panzer(panzers) & Cory Rivera(rcor)
+#CIS521 - HW01
+
 import string
+
 class SudokuBoard:
     # Constructor
     def __init__(self, inFile):
