@@ -7,6 +7,9 @@
 import string
 from copy import deepcopy
 
+def exists(p, l):
+  return reduce(lambda acc, x: p(x) or acc, l, False)
+
 class SudokuBoard:
     # Constructor
     def __init__(self, inFile):
@@ -98,38 +101,58 @@ class SudokuBoard:
     # numbers. Returns the list of the new boards.
     @staticmethod
     def next_blank_filled(state):
-      indices = [(i,j) for i in range(0,9) for j in range(0,9)]
-      def assign(board,i,j,num):
-          board[i][j] = num
-          return board
-      for (i,j) in indices:
-          if not state[i][j]:
-              return [assign(deepcopy(state),i,j,w) for w in range(1,10)]
-      return []
+        indices = [(i,j) for i in range(0,9) for j in range(0,9)]
+        def assign(board,i,j,num):
+            board[i][j] = num
+            return board
+        for (i,j) in indices:
+            if not state[i][j]:
+                return [assign(deepcopy(state),i,j,w) for w in range(1,10)]
+        return []
 
-    def dfs(self):
+    @staticmethod
+    # Does this board violate some constraint?
+    def violatesConstraints(board, constraints):
+        def violation(l):
+          items = map(lambda (i,j): board[i][j], l)
+          nonzeros = filter(lambda x: x, items)
+          return len(nonzeros) != len(set(nonzeros))
+        return exists(lambda x: violation(x), constraints)
+    
+    # The DFS is truly naive when prune is False.
+    def dfs(self, prune):
         states = [deepcopy(self.board)]
         time = 0
         space = 1
         while states:
-            new_states = self.next_blank_filled(states[0])
+            state = states[0]
+            states = states[1:]
             time += 1
             space = max(space, len(states))
-            # We don't need to check if an un-filled board is solved
-            if (not new_states) and SudokuBoard.boardSolved(states[0]):
-                return (states[0], time, space)
-            states = new_states + states[1:]
+            if SudokuBoard.boardSolved(state):
+                return (state, time, space)
+            if prune and SudokuBoard.violatesConstraints(state, self.__constraints):
+                continue
+            new_states = self.next_blank_filled(state)
+            states = new_states + states
         return (None, time, space)
 
-    def bfs(self):
+    # As with dfs, the BFS is truly naive when prune is False
+    def bfs(self, prune):
         states = [deepcopy(self.board)]
         time = 0
         space = 1
         while states:
-            new_states = self.next_blank_filled(states[0])
+            state = states[0]
+            states = states[1:]
             time += 1
             space = max(space, len(states))
-            if (not new_states) and SudokuBoard.boardSolved(states[0]):
-                return (states[0], time, space)
-            states = states[1:] + new_states
+            if SudokuBoard.boardSolved(state):
+                return (state, time, space)
+            
+            if prune and SudokuBoard.violatesConstraints(state, self.__constraints):
+                continue
+            new_states = self.next_blank_filled(state)
+            states = states + new_states
         return (None, time, space)
+
