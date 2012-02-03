@@ -5,6 +5,7 @@
 # CIS521 - HW02
 
 import string
+import random
 from copy import deepcopy
 
 def exists(p, l):
@@ -25,6 +26,9 @@ class SudokuBoard:
 
         # Note that we strip out the terminating newline from each line.
         return [[star(symbol) for symbol in line[:-1]] for line in f]
+
+    def getBoard():
+      return self.board
 
     # Print out board arrangement to console
     def printBoard(self):
@@ -156,3 +160,88 @@ class SudokuBoard:
             states = states + new_states
         return (None, time, space)
 
+    #Takes as input a number of iterations T, to be used as "temperature"
+    def simAnneal(self,T):
+
+      #helper function for finding unused nums in board according to constraints
+      def countNums(board, constraints):
+        def violation(l):
+          items = map(lambda (i,j): board[i][j], l)
+          nonzeros = filter(lambda x: x, items)
+          #9 possible values in filled row
+          #set(nonzeros) strips out duplicates
+          return 9 - len(set(nonzeros))
+        return reduce(lambda x,y: x+violation(y),constraints,0)
+
+      #new = old * 0.99
+      #decreases over time
+      def newProbability(current):
+        return current*0.99
+
+      #Fill board using column constraints
+      state = deepcopy(self.board)
+      probability = 0.99
+
+      #iterate over board, adding numbers into each column
+      for j in range(9):
+        #column i, row j
+        colConstraints = [(i,j) for i in range(0,9)] 
+        unused = list(self.computeUnusedNums(colConstraints))
+        for i in range(9):
+          if(state[i][j] == 0):
+            state[i][j] = unused[0]
+            unused = unused[1:]
+
+      #Successor function for Annealing Problem
+      def successorBoard():
+        #Returns a list of points that have intial value zero
+        pts=[(i,j) for i in range(9) for j in range(9) if self.board[i][j]==0]
+
+        board = deepcopy(self.board)
+
+        #get two random points from list of available points
+        first = pts[random.randint(0,len(pts)-1)]
+        second = pts[random.randint(0,len(pts)-1)]    
+
+        #swap elements
+        temp = board[first[0]][first[1]]
+        board[first[0]][first[1]] = board[second[0]][second[1]]
+        board[second[0]][second[1]] = temp
+
+        return board
+            
+      downhillMoves = 0
+      rejectedUphillMoves = 0
+      acceptedUphillMoves = 0
+
+      #main loop
+      while(T >= 0):
+        if(T == 0 or SudokuBoard.boardSolved(state)):
+          return (state,downhillMoves,rejectedUphillMoves,acceptedUphillMoves)
+
+        next = successorBoard()
+        newEnergy = countNums(next, self.__constraints)
+        oldEnergy = countNums(state, self.__constraints)
+
+        #get the difference between the two energy states
+        #If the new state is worse, use our probability function
+        #to see if we'll take the worse path.
+        difference = newEnergy - oldEnergy
+
+        if(difference < 0):
+          state = next
+          downhillMoves += 1
+          rejectedUphillMoves += 1
+        elif(probability > random.randint(0,10)/10.0):
+          state = next
+          acceptedUphillMoves += 1
+
+        #update probability function
+        probability = newProbability(probability)
+        #lower the temperature
+        T -= 1
+
+      
+
+      
+      
