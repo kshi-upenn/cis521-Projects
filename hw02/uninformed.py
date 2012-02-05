@@ -31,13 +31,15 @@ class SudokuBoard:
       return self.board
 
     # Print out board arrangement to console
-    def printBoard(self):
+    @staticmethod
+    def printBoard(board):
         star = lambda x: str(x) if x != 0 else "*"
         box = lambda x: string.join([str(c) for c in x],' ')
-        for i in range(len(self.board)):
-            result = [star(c) for c in self.board[i]]
-            result = box(result[:3]) + "  |  " + box(result[3:6]) + "  |  " + box(result[-3:])
-            print result
+        for i in range(len(board)):
+            result = [star(c) for c in board[i]]
+            if result:
+                result = box(result[:3]) + "  |  " + box(result[3:6]) + "  |  " + box(result[-3:])
+                print result
             if i==2 or i==5:
                 print '-------+---------+-------'
 
@@ -124,7 +126,7 @@ class SudokuBoard:
         return exists(lambda x: violation(x), constraints)
     
     # The DFS is truly naive when prune is False.
-    def dfs(self, prune):
+    def dfs(self, prune = False):
         states = [deepcopy(self.board)]
         time = 0
         space = 1
@@ -142,7 +144,7 @@ class SudokuBoard:
         return (None, time, space)
 
     # As with dfs, the BFS is truly naive when prune is False
-    def bfs(self, prune):
+    def bfs(self, prune = False):
         states = [deepcopy(self.board)]
         time = 0
         space = 1
@@ -162,7 +164,8 @@ class SudokuBoard:
 
     #Takes as input a number of iterations T, to be used as "temperature"
     def simAnneal(self,T):
-
+    #############################
+    ## Helper (local) functions
       #helper function for finding unused nums in board according to constraints
       def countNums(board, constraints):
         def violation(l):
@@ -177,11 +180,32 @@ class SudokuBoard:
       #decreases over time
       def newProbability(current):
         return current*0.99
+      #Successor function for Annealing Problem
+      def successorBoard(unfixed):
+        #Returns a list of points that have intial value zero
 
+        board = deepcopy(state)
+
+        #get two random points from list of available points
+        first = unfixed[random.randint(0,len(unfixed)-1)]
+        second = unfixed[random.randint(0,len(unfixed)-1)]    
+
+        #swap elements
+        temp = board[first[0]][first[1]]
+        board[first[0]][first[1]] = board[second[0]][second[1]]
+        board[second[0]][second[1]] = temp
+
+        return board
+
+     ######################################
+     ## The simulated annealing algorithm
       #Fill board using column constraints
       state = deepcopy(self.board)
       probability = 0.99
+      unfixed=[(i,j) for i in range(9) for j in range(9) if self.board[i][j]==0]
 
+      print("Start state: ")
+      print(state)
       #iterate over board, adding numbers into each column
       for j in range(9):
         #column i, row j
@@ -192,24 +216,6 @@ class SudokuBoard:
             state[i][j] = unused[0]
             unused = unused[1:]
 
-      #Successor function for Annealing Problem
-      def successorBoard():
-        #Returns a list of points that have intial value zero
-        pts=[(i,j) for i in range(9) for j in range(9) if self.board[i][j]==0]
-
-        board = deepcopy(self.board)
-
-        #get two random points from list of available points
-        first = pts[random.randint(0,len(pts)-1)]
-        second = pts[random.randint(0,len(pts)-1)]    
-
-        #swap elements
-        temp = board[first[0]][first[1]]
-        board[first[0]][first[1]] = board[second[0]][second[1]]
-        board[second[0]][second[1]] = temp
-
-        return board
-            
       downhillMoves = 0
       rejectedUphillMoves = 0
       acceptedUphillMoves = 0
@@ -217,9 +223,10 @@ class SudokuBoard:
       #main loop
       while(T >= 0):
         if(T == 0 or SudokuBoard.boardSolved(state)):
+          print("Stopped at T = " + str(T))
           return (state,downhillMoves,rejectedUphillMoves,acceptedUphillMoves)
 
-        next = successorBoard()
+        next = successorBoard(unfixed)
         newEnergy = countNums(next, self.__constraints)
         oldEnergy = countNums(state, self.__constraints)
 
@@ -231,17 +238,13 @@ class SudokuBoard:
         if(difference < 0):
           state = next
           downhillMoves += 1
-          rejectedUphillMoves += 1
         elif(probability > random.randint(0,10)/10.0):
           state = next
           acceptedUphillMoves += 1
+        else:
+          rejectedUphillMoves += 1
 
         #update probability function
         probability = newProbability(probability)
         #lower the temperature
         T -= 1
-
-      
-
-      
-      
