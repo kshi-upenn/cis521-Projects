@@ -25,7 +25,7 @@ class SudokuBoard:
         star = lambda x: int(x) if x != "*" else 0
 
         # Note that we strip out the terminating newline from each line.
-        return [[star(symbol) for symbol in line[:-1]] for line in f]
+        return [[star(symbol) for symbol in line[:-1]] for line in f][:9]
 
     def getBoard():
       return self.board
@@ -37,9 +37,8 @@ class SudokuBoard:
         box = lambda x: string.join([str(c) for c in x],' ')
         for i in range(len(board)):
             result = [star(c) for c in board[i]]
-            if result:
-                result = box(result[:3]) + "  |  " + box(result[3:6]) + "  |  " + box(result[-3:])
-                print result
+            result = box(result[:3]) + "  |  " + box(result[3:6]) + "  |  " + box(result[-3:])
+            print result
             if i==2 or i==5:
                 print '-------+---------+-------'
 
@@ -180,10 +179,10 @@ class SudokuBoard:
       #decreases over time
       def newProbability(current):
         return current*0.99
-      #Successor function for Annealing Problem
-      def successorBoard(unfixed):
-        #Returns a list of points that have intial value zero
 
+      # Successor function for Annealing Problem
+      def successorBoard(unfixed):
+        # unfixed is a list of points that can be swapped
         board = deepcopy(state)
 
         #get two random points from list of available points
@@ -205,7 +204,7 @@ class SudokuBoard:
       unfixed=[(i,j) for i in range(9) for j in range(9) if self.board[i][j]==0]
 
       print("Start state: ")
-      print(state)
+      SudokuBoard.printBoard(state)
       #iterate over board, adding numbers into each column
       for j in range(9):
         #column i, row j
@@ -226,9 +225,12 @@ class SudokuBoard:
           print("Stopped at T = " + str(T))
           return (state,downhillMoves,rejectedUphillMoves,acceptedUphillMoves)
 
+        print(str(T) + ": ")
         next = successorBoard(unfixed)
         newEnergy = countNums(next, self.__constraints)
         oldEnergy = countNums(state, self.__constraints)
+        print("Old energy: "+ str(oldEnergy))
+        print("New energy: "+ str(newEnergy))
 
         #get the difference between the two energy states
         #If the new state is worse, use our probability function
@@ -238,11 +240,16 @@ class SudokuBoard:
         if(difference < 0):
           state = next
           downhillMoves += 1
-        elif(probability > random.randint(0,10)/10.0):
+          print("Accept improvement.")
+        elif(probability > random.random()):
           state = next
           acceptedUphillMoves += 1
+          print("Accept worsening.")
         else:
           rejectedUphillMoves += 1
+          print("Reject bad move")
+        # SudokuBoard.printBoard(state)
+        print("End Energy: "+ str(countNums(state, self.__constraints)))
 
         #update probability function
         probability = newProbability(probability)
