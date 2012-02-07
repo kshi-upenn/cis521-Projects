@@ -12,3 +12,6 @@
 5) The space complexity for BFS is 9^r, in this case. This would yield a space
 complexity of 9^40, or 2^126 in base 2. 2^126 is FAR beyond even the age of the universe, so storing 2^126 bytes is clearly impossible.
 
+6)
+
+7) 
