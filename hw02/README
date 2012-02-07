@@ -1,0 +1,17 @@
+//README for HW02 - Search
+
+Create an instance of SudokuBoard:
+	board = SudokuBoard("FILENAME")
+Call each search method using object methods:
+	//DFS & BFS take a boolean argument for turning pruning on/off
+	//board.dfs(True) will make the search much more efficient
+
+	board.dfs()
+	board.bfs()
+	//BFS & DFS return a tuple of (board,spaceComplexity,timeComplexity)
+
+	board.simAnneal(INTEGER) //Integer is number of iterations
+	//return tuple of (board,acceptedDownhill,uphillRejects,uphillAccepted)
+
+//test.py executable included for convenience of testing
+//just run from terminal as ./tesy.py with search.py
