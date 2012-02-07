@@ -28,3 +28,5 @@ didn't solve the medium board, and it worked for all ten trials after the
 switch.
 We suspect it's because it is easier to accept a change that steps away from a
 local extremum, though this might be a sudoku-specific effect.
+
+
