@@ -203,8 +203,6 @@ class SudokuBoard:
       probability = 0.99
       unfixed=[(i,j) for i in range(9) for j in range(9) if self.board[i][j]==0]
 
-      print("Start state: ")
-      SudokuBoard.printBoard(state)
       #iterate over board, adding numbers into each column
       for j in range(9):
         #column i, row j
@@ -225,7 +223,6 @@ class SudokuBoard:
           print("Stopped at T = " + str(T))
           return (state,downhillMoves,rejectedUphillMoves,acceptedUphillMoves)
 
-        print(str(T) + ": ")
         next = successorBoard(unfixed)
         newEnergy = countNums(next, self.__constraints)
         oldEnergy = countNums(state, self.__constraints)
@@ -248,8 +245,6 @@ class SudokuBoard:
         else:
           rejectedUphillMoves += 1
           print("Reject bad move")
-        # SudokuBoard.printBoard(state)
-        print("End Energy: "+ str(countNums(state, self.__constraints)))
 
         #update probability function
         probability = newProbability(probability)
