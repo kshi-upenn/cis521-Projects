@@ -12,6 +12,9 @@
 5) The space complexity for BFS is 9^r, in this case. This would yield a space
 complexity of 9^40, or 2^126 in base 2. 2^126 is FAR beyond even the age of the universe, so storing 2^126 bytes is clearly impossible.
 
-6)
+6) There are 9 options for each of the originally empty positions, so there are
+9^r states available.
 
-7) 
+7) Part 3 suggests that we consider pick two originally empty positions and swap
+them. Another (original) function we could consider using is to pick a single
+originally empty function and assign it a random number.
