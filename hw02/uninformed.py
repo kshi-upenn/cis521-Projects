@@ -220,14 +220,11 @@ class SudokuBoard:
       #main loop
       while(T >= 0):
         if(T == 0 or SudokuBoard.boardSolved(state)):
-          print("Stopped at T = " + str(T))
-          return (state,downhillMoves,rejectedUphillMoves,acceptedUphillMoves)
+            return (state,downhillMoves,rejectedUphillMoves,acceptedUphillMoves)
 
         next = successorBoard(unfixed)
         newEnergy = countNums(next, self.__constraints)
         oldEnergy = countNums(state, self.__constraints)
-        print("Old energy: "+ str(oldEnergy))
-        print("New energy: "+ str(newEnergy))
 
         #get the difference between the two energy states
         #If the new state is worse, use our probability function
@@ -237,14 +234,11 @@ class SudokuBoard:
         if(difference < 0):
           state = next
           downhillMoves += 1
-          print("Accept improvement.")
         elif(probability > random.random()):
           state = next
           acceptedUphillMoves += 1
-          print("Accept worsening.")
         else:
           rejectedUphillMoves += 1
-          print("Reject bad move")
 
         #update probability function
         probability = newProbability(probability)
