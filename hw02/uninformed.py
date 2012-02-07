@@ -231,7 +231,7 @@ class SudokuBoard:
         #to see if we'll take the worse path.
         difference = newEnergy - oldEnergy
 
-        if(difference < 0):
+        if(difference <= 0):
           state = next
           downhillMoves += 1
         elif(probability > random.random()):
