@@ -59,6 +59,11 @@ class SudokuBoard:
         return filter(lambda (x,y): len(self.board[(x,y)]) != 1, c)
       return {x:uncertain(x) for x in self.__constraints}
 
+    def binaryConstraints(self):
+      m = self.__uncertainMap
+      return [(k,v) for ks in m.keys() for k in ks for v in m[ks] if k != v ]
+
+
     # Returns constraints that are relevant to a given point
     def __computePointDict(self):
         grid = [(i,j) for i in range(0,9) for j in range(0,9)]

@@ -15,3 +15,5 @@ Call each search method using object methods:
 
 //test.py executable included for convenience of testing
 //just run from terminal as ./tesy.py with search.py
+
+Test results can be found in results.xls (Excel spreadsheet)
