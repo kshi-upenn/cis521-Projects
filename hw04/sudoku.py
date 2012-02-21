@@ -94,3 +94,12 @@ class SudokuBoard:
     # Gets constraints associated with a specific point
     def getConstraintSets(self,point):
         return self.__pointDict[point]
+
+    def AC_3(self):
+      # Build a queue of tuples, each representing the binary constraints.
+      # Each point is grouped with another point in its constraint
+      # The binary constraint is that no two squares in the same constraint
+      # can have the same value.
+      # 
+      # Iterate over uncertain values in a constraint, then map those to
+      # each other value in the constraint.
