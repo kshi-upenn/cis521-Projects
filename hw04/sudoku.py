@@ -6,6 +6,7 @@
 # CIS521 - HW01
 
 import string
+from sets import ImmutableSet
 
 class SudokuBoard:
     # Constructor
@@ -13,15 +14,17 @@ class SudokuBoard:
         self.board = self.parseBoard(inFile)
         self.__constraints = self.__computeConstraintsSets()
         self.__pointDict = self.__computePointDict()
+        self.__uncertainMap = self.computeUncertainMap()
         
     # Parses an input file to build 9x9 Sudoku board
     def parseBoard(self, inFile):
         f = open(inFile, 'r')
         # Function to replace stars with zeroes
-        star = lambda x: [int(x)] if x != "*" else set(range(1,10))
+        star = lambda x: [int(x)] if x != "*" else ImmutableSet(range(1,10))
 
         # Note that we strip out the terminating newline from each line.
-        return [[star(symbol) for symbol in line[:-1]] for line in f][:9]
+        array = [[star(symbol) for symbol in line[:-1]] for line in f][:9]
+        return {(i,j): array[i][j] for i in range(0,9) for j in range(0,9)}
 
     # Print out board arrangement to console
     def printBoard(self):
@@ -34,11 +37,11 @@ class SudokuBoard:
             if i==2 or i==5:
                 print '-------+---------+-------'
 
-    # Returns set of constraints that are used by solution finder
-    # The set contains row, column, and 3x3 box constraints
+    # Returns ImmutableSet of constraints that are used by solution finder
+    # The ImmutableSet contains row, column, and 3x3 box constraints
     def __computeConstraintsSets(self):
-        rowConstraints = [set([(i,j) for j in range(0,9)]) for i in range(0,9)]
-        colConstraints = [set([(i,j) for i in range(0,9)]) for j in range(0,9)]
+        rowConstraints = [ImmutableSet([(i,j) for j in range(0,9)]) for i in range(0,9)]
+        colConstraints = [ImmutableSet([(i,j) for i in range(0,9)]) for j in range(0,9)]
 
         grid = [(i, j) for i in [0,1,2] for j in [0,1,2]]
 
@@ -46,10 +49,15 @@ class SudokuBoard:
         # For each major block, create a tuple for each entry in that block
         # 3*i, 3*j -> offsets which major block is being used
         # di, dj -> iterates across grid in major block
-        boxConstraints = [set([(3 * i + di, 3 * j + dj) for (di,dj) in grid]) for (i,j) in grid]
+        boxConstraints = [ImmutableSet([(3 * i + di, 3 * j + dj) for (di,dj) in grid]) for (i,j) in grid]
         
         # Concatenate sets together (ordering of the sets does not matter)
         return rowConstraints + colConstraints + boxConstraints
+
+    def computeUncertainMap(self):
+      def uncertain(c):
+        return filter(lambda (x,y): len(self.board[(x,y)]) != 1, c)
+      return {x:uncertain(x) for x in self.__constraints}
 
     # Returns constraints that are relevant to a given point
     def __computePointDict(self):
@@ -67,16 +75,16 @@ class SudokuBoard:
     def computeUnusedNums(self, locations):
         # Get board numbers along a given constraint, then strip out the
         # nonzero (non-star) values.
-        return set(range(0,10)) - set([self.board[i][j] for (i,j) in locations])
+        return ImmutableSet(range(0,10)) - ImmutableSet([self.board[i][j] for (i,j) in locations])
 
     # Determines if all squares are filled in according to Sudoku rules
     # If all constraints are satisfied, then the game is complete
     def isSolved(self):
-        # See if a given row is filled (matches set(1,...,9))
+        # See if a given row is filled (matches ImmutableSet(1,...,9))
         # row is determined by constraint sets
-        # x -> constraint set
+        # x -> constraint ImmutableSet
         def satisfied(x):
-            return set([self.board[i][j] for (i,j) in x]) == set(range(1,10))
+            return ImmutableSet([self.board[i][j] for (i,j) in x]) == ImmutableSet(range(1,10))
 
         # reduce -> takes function to combine two elements
         # map each constraint to whether it has been satisfied
