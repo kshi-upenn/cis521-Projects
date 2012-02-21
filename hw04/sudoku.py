@@ -61,7 +61,7 @@ class SudokuBoard:
 
     def binaryConstraints(self):
       m = self.__uncertainMap
-      return [(k,v) for ks in m.keys() for k in ks for v in m[ks] if k != v ]
+      return [(v,k) for ks in m.keys() for k in ks for v in m[ks] if k != v ]
 
 
     # Returns constraints that are relevant to a given point
@@ -99,4 +99,14 @@ class SudokuBoard:
     # Gets constraints associated with a specific point
     def getConstraintSets(self,point):
         return self.__pointDict[point]
+
+    def assignSingles(self, domains):
+        changed = False
+        for p in domains:
+            d = domains[p]
+            if len(d) == 1 and len(self.board[p]) != 1:
+                self.board[p] = [d]
+                changed = True
+        if changed:
+            self.__uncertainMap = self.computeUncertainMap()
 
