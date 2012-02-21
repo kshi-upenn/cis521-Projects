@@ -20,7 +20,7 @@ class SudokuBoard:
     def parseBoard(self, inFile):
         f = open(inFile, 'r')
         # Function to replace stars with zeroes
-        star = lambda x: [int(x)] if x != "*" else ImmutableSet(range(1,10))
+        star = lambda x: set([int(x)]) if x != "*" else set(range(1,10))
 
         # Note that we strip out the terminating newline from each line.
         array = [[star(symbol) for symbol in line[:-1]] for line in f][:9]
@@ -28,13 +28,14 @@ class SudokuBoard:
 
     # Print out board arrangement to console
     def printBoard(self):
-        star = lambda x: str(x) if x != 0 else "*"
+        star = lambda x: str(list(x)[0]) if len(x) == 1 else "*"
         box = lambda x: string.join([str(c) for c in x],' ')
-        for i in range(len(self.board)):
-            result = [star(c) for c in self.board[i]]
+
+        for row in range(0,9):
+            result = [star(self.board[(row,c)]) for c in range(0,9)]
             result = box(result[:3]) + "  |  " + box(result[3:6]) + "  |  " + box(result[-3:])
             print result
-            if i==2 or i==5:
+            if row==2 or row==5:
                 print '-------+---------+-------'
 
     # Returns ImmutableSet of constraints that are used by solution finder
@@ -61,7 +62,7 @@ class SudokuBoard:
 
     def binaryConstraints(self):
       m = self.__uncertainMap
-      return [(k,v) for ks in m.keys() for k in ks for v in m[ks] if k != v ]
+      return [(v,k) for ks in m.keys() for k in ks for v in m[ks] if k != v ]
 
 
     # Returns constraints that are relevant to a given point
@@ -108,3 +109,49 @@ class SudokuBoard:
       # 
       # Iterate over uncertain values in a constraint, then map those to
       # each other value in the constraint.
+
+      queue = self.binaryConstraints()
+
+      def revise(first,second):
+        revised = False
+        
+        # If the second tuple is singular (contains only one value in its domain)
+        # then we need to remove that value from first's domain
+        # A constraint is only violated if two items are equal, and the only
+        # way two items can be definitively in conflict is if one of them
+        # only has one value.
+        secondDomain = self.board[second]
+
+        if(len(secondDomain) == 1):
+
+          # Remove the value from first's domain, if applicable
+          value = list(secondDomain)[0]
+
+          print(first)
+          if value in self.board[first]:
+            self.board[first].remove(value)
+            revised = True
+
+        return revised
+
+      while queue:
+        (xa,xb) = queue[0]
+        queue = queue[1:]
+
+        # Check if domains need to be revised
+        if revise(xa,xb):
+
+          # If any domain has been reduced to zero, then a solution is
+          # impossible.
+          if len(self.board[xa]) == 0:
+            return False
+
+          for x in (self.__pointDict[xa]):
+            for xc in x:
+              if xc != xb:
+               queue.append((xc,xa))
+
+        # Domains are all non-zero, so AC-3 finished without problems
+        # Found a solution (each square is mapped to only one value)
+      return True
+             
