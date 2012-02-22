@@ -138,21 +138,11 @@ class SudokuBoard:
         firstDomain = self.board[first]
 
         if(len(secondDomain) == 1):
-
-          # Remove the value from first's domain, if applicable
           value = list(secondDomain)[0]
 
-          if value in self.board[first]:
-            self.board[first].remove(value)
+          if value in firstDomain:
+            firstDomain.remove(value)
             revised = True
-
-        elif(len(firstDomain) == 1):
-          value = list(firstDomain)[0]
-
-          if value in self.board[second]:
-            self.board[second].remove(value)
-            revised = True
-
         return revised
 
       while queue:
@@ -164,12 +154,12 @@ class SudokuBoard:
 
           # If any domain has been reduced to zero, then a solution is
           # impossible.
-          if len(self.board[xa]) == 0:
+          if len(self.board[xb]) == 0:
             return False
 
           for x in (self.__pointDict[xa]):
             for xc in x:
-              if xc != xb:
+              if xc != xb and xc != xa:
                 queue.append((xc,xa))
 
       # Domains are all non-zero, so AC-3 finished without problems
