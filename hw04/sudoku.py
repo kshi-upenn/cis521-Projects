@@ -90,7 +90,7 @@ class SudokuBoard:
         # row is determined by constraint sets
         # x -> constraint ImmutableSet
         def satisfied(x):
-            return ImmutableSet([self.board[i][j] for (i,j) in x]) == ImmutableSet(range(1,10))
+            return ImmutableSet([j for i in x for j in self.board[i] if len(self.board[i]) == 1]) == ImmutableSet(range(1,10))
 
         # reduce -> takes function to combine two elements
         # map each constraint to whether it has been satisfied
@@ -100,6 +100,16 @@ class SudokuBoard:
     # Gets constraints associated with a specific point
     def getConstraintSets(self,point):
         return self.__pointDict[point]
+
+    def assignSingles(self, domains):
+        changed = False
+        for p in domains:
+            d = domains[p]
+            if len(d) == 1 and len(self.board[p]) != 1:
+                self.board[p] = [d]
+                changed = True
+        if changed:
+            self.__uncertainMap = self.computeUncertainMap()
 
     def AC_3(self):
       # Build a queue of tuples, each representing the binary constraints.
