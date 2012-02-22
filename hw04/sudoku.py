@@ -127,7 +127,6 @@ class SudokuBoard:
           # Remove the value from first's domain, if applicable
           value = list(secondDomain)[0]
 
-          print(first)
           if value in self.board[first]:
             self.board[first].remove(value)
             revised = True
@@ -149,9 +148,10 @@ class SudokuBoard:
           for x in (self.__pointDict[xa]):
             for xc in x:
               if xc != xb:
-               queue.append((xc,xa))
+                queue.append((xc,xa))
 
-        # Domains are all non-zero, so AC-3 finished without problems
-        # Found a solution (each square is mapped to only one value)
+      # Domains are all non-zero, so AC-3 finished without problems
+      # Found a solution (each square is mapped to only one value)
+
       return True
              
