@@ -105,41 +105,49 @@ class SudokuBoard:
     def getConstraintSets(self,point):
         return self.__pointDict[point]
 
+    def printPossibles(self,b):
+      for i in range(0,9):
+        for j in range(0,9):
+          print(str((i,j)) + ": " + str(list(b[(i,j)])))
+
+
     def assignSingles(self, domains):
-        changed = False
-        for p in domains:
-            d = domains[p]
-            if len(d) == 1 and len(self.board[p]) != 1:
-                self.board[p] = [d]
-                changed = True
-        if changed:
-            self.__uncertainMap = self.computeUncertainMap()
+        modified = []
+        for constraint in self.__constraints:
+            # We track a list of the values which are only available to a single
+            # variable, but we only count values that aren't already assigned
+            def variablesOf(v):
+              return [p for p in constraint if v in self.board[p]]
+            counter = {v: variablesOf(v) for v in range(1,10)}
+            units = {counter[v][0]: v for v in counter if len(counter[v]) == 1}
+            for p in units:
+              if len(self.board[p]) > 1:
+                self.board[p] = set([units[p]])
+                modified = [p] + modified
+        return modified
 
-    def AC_3(self):
-      # Build a queue of tuples, each representing the binary constraints.
-      # Each point is grouped with another point in its constraint
-      # The binary constraint is that no two squares in the same constraint
-      # can have the same value.
-      # 
-      # Iterate over uncertain values in a constraint, then map those to
-      # each other value in the constraint.
-
+    # Build a queue of tuples, each representing the binary constraints.
+    # Each point is grouped with another point in its constraint
+    # The binary constraint is that no two squares in the same constraint
+    # can have the same value.
+    # 
+    # Iterate over uncertain values in a constraint, then map those to
+    # each other value in the constraint.
+    def AC_3(self, handleSingles = False):
       queue = self.binaryConstraints()
 
+      # If the second tuple is singular (contains only one value in its domain)
+      # then we need to remove that value from first's domain
+      # A constraint is only violated if two items are equal, and the only
+      # way two items can be definitively in conflict is if one of them
+      # only has one value.
       def revise(first,second):
         revised = False
-        
-        # If the second tuple is singular (contains only one value in its domain)
-        # then we need to remove that value from first's domain
-        # A constraint is only violated if two items are equal, and the only
-        # way two items can be definitively in conflict is if one of them
-        # only has one value.
         secondDomain = self.board[second]
         firstDomain = self.board[first]
 
         if(len(secondDomain) == 1):
           value = list(secondDomain)[0]
-
           if value in firstDomain:
             firstDomain.remove(value)
             revised = True
@@ -148,26 +156,28 @@ class SudokuBoard:
       while queue:
         (xa,xb) = queue[0]
         queue = queue[1:]
-
         # Check if domains need to be revised
         if revise(xa,xb):
-
           # If any domain has been reduced to zero, then a solution is
           # impossible.
           if len(self.board[xb]) == 0:
             return False
 
-          for x in (self.__pointDict[xa]):
+          for x in self.__pointDict[xa]:
             for xc in x:
               if xc != xb and xc != xa:
                 queue.append((xc,xa))
 
+        # If AC-3 would give up, we try to catch any singular values
+        if not queue and handleSingles:
+          altered = self.assignSingles(self.board)
+          for p in altered:
+            for x in self.__pointDict[p]:
+              for xc in x:
+                if xc != p:
+                  #print("(p,x): " + str((p,xc)))
+                  queue.append((xc,p))
+
       # Domains are all non-zero, so AC-3 finished without problems
       # Found a solution (each square is mapped to only one value)
-
-      # for x in self.board.keys():
-       # print("Point: " + str(x))
-       # print("Its domain: " + str(self.board[x]))
-
       return True
-             
