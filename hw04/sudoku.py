@@ -28,7 +28,7 @@ class SudokuBoard:
 
     # Print out board arrangement to console
     def printBoard(self):
-        star = lambda x: str(list(x)[0]) if len(x) == 1 else "*"
+        star = lambda x: str(list(x)[0]) if len(x) == 1 else "_"
         box = lambda x: string.join([str(c) for c in x],' ')
 
         for row in range(0,9):
@@ -55,14 +55,18 @@ class SudokuBoard:
         # Concatenate sets together (ordering of the sets does not matter)
         return rowConstraints + colConstraints + boxConstraints
 
+    # Return a dictionary mapping each constraint set to a set of its uncertain
+    # points
     def computeUncertainMap(self):
       def uncertain(c):
         return filter(lambda (x,y): len(self.board[(x,y)]) != 1, c)
       return {x:uncertain(x) for x in self.__constraints}
 
+    # Return a list of all (point,point) pairs where the two points must not be
+    # equal
     def binaryConstraints(self):
       m = self.__uncertainMap
-      return [(v,k) for ks in m.keys() for k in ks for v in m[ks] if k != v ]
+      return [(v,k) for ks in m.keys() for k in ks for v in m[ks] if k != v]
 
 
     # Returns constraints that are relevant to a given point
