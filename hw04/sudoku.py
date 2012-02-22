@@ -135,6 +135,7 @@ class SudokuBoard:
         # way two items can be definitively in conflict is if one of them
         # only has one value.
         secondDomain = self.board[second]
+        firstDomain = self.board[first]
 
         if(len(secondDomain) == 1):
 
@@ -143,6 +144,13 @@ class SudokuBoard:
 
           if value in self.board[first]:
             self.board[first].remove(value)
+            revised = True
+
+        elif(len(firstDomain) == 1):
+          value = list(firstDomain)[0]
+
+          if value in self.board[second]:
+            self.board[second].remove(value)
             revised = True
 
         return revised
@@ -166,6 +174,10 @@ class SudokuBoard:
 
       # Domains are all non-zero, so AC-3 finished without problems
       # Found a solution (each square is mapped to only one value)
+
+      # for x in self.board.keys():
+       # print("Point: " + str(x))
+       # print("Its domain: " + str(self.board[x]))
 
       return True
              
