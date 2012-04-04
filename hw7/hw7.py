@@ -6,7 +6,7 @@ from Dataset import Dataset
 # Bayesian Classifier
 # First, we need to build the probability model
 
-d = Dataset("rec.sport.hockey.txt", "rec.sport.baseball.txt", cutoff=200)
+d = Dataset("rec.sport.hockey.txt", "rec.sport.baseball.txt", cutoff=100)
 #d = Dataset("comp.sys.mac.hardware.txt", "comp.sys.ibm.pc.hardware.txt", cutoff=2000)
 (Xtrain, Ytrain, Xtest, Ytest) = d.getTrainAndTestSets(0.8, seed=1)
 wordlist = d.getWordList()
@@ -55,48 +55,59 @@ def perceptronTrain(X,Y, l = 1):
   w = array([average(m[:,i]) for i in range(m.shape[1])])
   return (w, iterations)
 
+def error(w,X,Y,columns, l):
+   #print (Y)
+   #print (Y - dot(w.T, (X[:,columns])[0]))
+   s1 = sum([linalg.norm(Y - dot(w.T,x)) for x in X[:,columns]])
+   s2 = l * linalg.norm(w)
+   print(s1,s2)
+   s3 = s1 + s2
+   return s3
+
 def streamwiseTrain(X, Y, l = 1):
-  def error(w,X,Y):
-    return sum([sum(Y - dot(w,x)) + l * sum(w[w != 0]) for x in X])
   cols = []
   w = zeros(X.shape[0])
-  e = 1
+  e = sum([linalg.norm(Y) for x in X])
   for j in range(X.shape[1]):
+    print("Now on " + str(j))
+    print("e = " + str(e))
     newCols = cols + [j]
-    print(X[:,newCols])
     w = ridgeTrain(X[:,newCols], Y, l)
-    curr = error(w,X,Y)
-    if curr < w:
+    curr = error(w,X,Y,newCols, l)
+    print(w)
+    if curr < e:
+      print("Accepting column " + str(j))
       cols = newCols
-  return ridgeTrain(X[:,cols],Y,l)
+      e = curr
+  print cols
+  return (ridgeTrain(X[:,cols],Y,l),cols)
 
 def stepwiseTrain(X, Y, l = 1, maxFeatures = 50):
-  def error(w,X,y):
-    return sum([sum(y - dot(w,x)) + l * sum(w[w != 0]) for x in X])
   cols = []
   w = zeros(X.shape[0])
-  e = 1
-  bestError = None
+  e = sum([linalg.norm(Y) for x in X])
   while cols.size < maxFeatures:
     best = None
     for j in (range(X.shape[1]) - cols):
       newCols = cols + [j]
       w = ridgeTrain(X[:,cols], Y, l)
-      curr = error(w,X,y)
-      if bestError == None or curr < bestError:
+      curr = error(w,X,y,cols)
+      if curr < e:
         best = j
-        bestError = curr
+        e = curr
     if best == None:
       break
     else:
       cols = cols + [best]
-  return ridgeTrain(X[:,cols],Y,l)
+  return (ridgeTrain(X[:,cols],Y,l),cols)
 
 # (w, iterations) = perceptronTrain(Xtrain, Ytrain)
-# w = ridgeTrain(Xtrain, Ytrain)
-w = streamwiseTrain(Xtrain, Ytrain)
+w = ridgeTrain(Xtrain, Ytrain)
+#(w,cols) = streamwiseTrain(Xtrain, Ytrain)
 right = 0
 wrong = 0
+print("Error: ")
+print(error(w,Xtrain, Ytrain, range(Xtrain.shape[1]), 1))
 for i in range(Xtest.shape[0]):
   #result = perceptronClassify(w,Xtest[i])
   result = ridgeClassify(w,Xtest[i]) 
