@@ -3,7 +3,7 @@
 
 # Written by:
 #  Sam Panzer(panzers) & Cory Rivera(rcor)
-# CIS521 - HW01
+# CIS521 - HW04
 
 import string
 from sets import ImmutableSet

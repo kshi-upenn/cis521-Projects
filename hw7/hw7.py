@@ -13,19 +13,51 @@ wordlist = d.getWordList()
 
 def trainNaiveBayes(X, Y):
   # First, count frequencies given the category
-  print Y
+
+  # Each row is a post, and each column is a word
+  # To count the number of words from every post, sum up the values from each
+  # column for a given category
+
+  # Flattens Y so that it is easier to iterate over
   yFlat = Y.flatten()
-  yOne = yFlat == 1
-  yZero = yFlat == 0
-  cat1 = array([sum(X[yOne,j]) / sum(yOne) for j in range(X.shape[1])])
-  cat2 = array([sum(X[yZero,j]) / sum(Zero) for j in range(X.shape[1])])
-  return (cat1, cat2)
+  yPos = yFlat == 1
+  yNeg = yFlat == -1
 
-def naiveBayesClassify(cat1, cat2, x):
-  # Not actually implemented!
-  return 1
+  # X.shape[1] returns number of columns for a given matrix
+  numColumns = X.shape[1]
 
-# trainNaiveBayes(Xtrain,Ytrain)
+  # Indexing with a boolean array like yOne only checks indices that are True
+  # For each column, this comprehension adds up values from the rows in that
+  # column that match True indices in yPos or yNeg
+  def getProb(yVector):
+    total = sum( [sum(X[yVector,j]) for j in range(numColumns)] )
+
+    # Need to pad each sum by one, and the total by the number of words, so as
+    # to avoid zero probabilities
+    total += X.shape[1]
+    prob = array([ (sum(X[yVector,j]) + 1) / total for j in range(numColumns)])
+
+    return prob
+
+  probPos = getProb(yPos)
+  probNeg = getProb(yNeg)
+  
+  # Since both of these probabilities have the same denominator, and we only care
+  # about which one is greater, we can just drop the denominator entirely
+
+  # The numbers are so small that products become impossible, so we can just
+  # keep track of the ratios
+  probRatio = array([ probPos[i] / probNeg[i] for i in range(probPos.shape[0]) ]) 
+
+  return probRatio
+
+def naiveBayesClassify(probRatio):
+  avgRatio = sum(probRatio) / probRatio.shape[0]
+
+  if(avgRatio > 1.0):
+    return 1
+
+  return -1
 
 def ridgeTrain(X, Y, l = 1):
   Xt = matrix(X.T)
@@ -53,11 +85,9 @@ def perceptronTrain(X,Y, l = 1):
   return (w, iterations)
 
 def l2Error(w,X,Y,columns, l):
-   #print (Y)
-   #print (Y - dot(w.T, (X[:,columns])[0]))
    s1 = sum([linalg.norm(Y - dot(w.T,x)) for x in X[:,columns]])
    s2 = l * linalg.norm(w)
-   print(s1,s2)
+
    s3 = s1 + s2
    return s3
 
@@ -78,15 +108,13 @@ def streamwiseTrain(X, Y, l = 1):
   w = zeros(X.shape[0])
   e = sum([linalg.norm(Y) for x in X])
   for j in range(X.shape[1]):
-    print("Now on " + str(j))
-    # print("e = " + str(e))
     newCols = cols + [j]
     w = ridgeTrain(X[:,newCols], Y, l)
     curr = error(w,X,Y,newCols)  + l * linalg.norm(w)
     if curr < e:
       cols = newCols
       e = curr
-  #print cols
+
   return (ridgeTrain(X[:,cols],Y,l),cols)
 
 def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
@@ -94,7 +122,6 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
   w = zeros(X.shape[0])
   e = sum([linalg.norm(Y) for x in X])
   while len(cols) < maxFeatures:
-    print("Now on " + str(len(cols)))
     best = None
     for j in range(X.shape[1]):
       if j in cols:
@@ -111,14 +138,18 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
       cols = cols + [best]
   return (ridgeTrain(X[:,cols],Y,l),cols)
 
-(w, iterations) = perceptronTrain(Xtrain, Ytrain)
+# (w, iterations) = perceptronTrain(Xtrain, Ytrain)
 # w = ridgeTrain(Xtrain, Ytrain)
 # (w,cols) = streamwiseTrain(Xtrain, Ytrain)
 # (w,cols) = stepwiseTrain(Xtrain, Ytrain)
 
-e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
+# e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
 # e = error(w, Xtest, Ytest, cols)
-print("Right: " + str(Ytest.shape[0] - e))
-print("Wrong: " + str(e))
+# print("Right: " + str(Ytest.shape[0] - e))
+# print("Wrong: " + str(e))
 #print(error(w,Xtrain, Ytrain, range(Xtrain.shape[1])))
 # print("Right: " + str(right) + "; wrong: " + str(wrong))
+
+# Bayes Testing
+prob = trainNaiveBayes(Xtrain,Ytrain)
+print("Bayes - Most Likely Category: " + str(naiveBayesClassify(prob)))
