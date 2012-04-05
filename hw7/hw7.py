@@ -117,7 +117,7 @@ def streamwiseTrain(X, Y, l = 1):
 
   return (ridgeTrain(X[:,cols],Y,l),cols)
 
-def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
+def stepwiseTrain(X, Y, l = 1, maxFeatures = 25):
   cols = []
   w = zeros(X.shape[0])
   e = sum([linalg.norm(Y) for x in X])
@@ -138,18 +138,45 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
       cols = cols + [best]
   return (ridgeTrain(X[:,cols],Y,l),cols)
 
-# (w, iterations) = perceptronTrain(Xtrain, Ytrain)
-# w = ridgeTrain(Xtrain, Ytrain)
-# (w,cols) = streamwiseTrain(Xtrain, Ytrain)
-# (w,cols) = stepwiseTrain(Xtrain, Ytrain)
+# Pardon the repetition in this function...
+def runTests():
+  trainTotal = Ytrain.shape[0]
+  testTotal = Ytest.shape[0]
+  print "Training: Perception..."
+  (w, iterations) = perceptronTrain(Xtrain, Ytrain)
+  e = error(w,Xtrain, Ytrain, range(Xtrain.shape[1]))
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
+  print("Test error: " + str(e) + " of " + str(testTotal))
 
-# e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
-# e = error(w, Xtest, Ytest, cols)
-# print("Right: " + str(Ytest.shape[0] - e))
-# print("Wrong: " + str(e))
-#print(error(w,Xtrain, Ytrain, range(Xtrain.shape[1])))
-# print("Right: " + str(right) + "; wrong: " + str(wrong))
+  #print "\nTraining: Naive Bayes..."
+  #prob = trainNaiveBayes(Xtrain,Ytrain)
+  #print("Bayes - Most Likely Category: " + str(naiveBayesClassify(prob)))
 
-# Bayes Testing
-prob = trainNaiveBayes(Xtrain,Ytrain)
-print("Bayes - Most Likely Category: " + str(naiveBayesClassify(prob)))
+  print "\nTraining: Ridge Regression..."
+  w = ridgeTrain(Xtrain, Ytrain)
+  e = error(w,Xtrain, Ytrain, range(Xtrain.shape[1]))
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
+  print("Test error: " + str(e) + " of " + str(testTotal))
+
+  print "\nTraining: Streamwise..."
+  (w,cols) = streamwiseTrain(Xtrain, Ytrain)
+  e = error(w, Xtrain, Ytrain, cols)
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w, Xtest, Ytest, cols)
+  print("Test error: " + str(e) + " of " + str(testTotal))
+  print("Top ten columns selected:")
+  print([wordlist[c] for c in cols][:10])
+
+  print "\nTraining: Stepwise..."
+  (w,cols) = stepwiseTrain(Xtrain, Ytrain)
+  e = error(w, Xtrain, Ytrain, cols)
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w, Xtest, Ytest, cols)
+  print("Test error: " + str(e) + " of " + str(testTotal))
+  print("Top ten columns selected:")
+  print([wordlist[c] for c in cols][:10])
+
+if __name__ == "__main__":
+  runTests()
