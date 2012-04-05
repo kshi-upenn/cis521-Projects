@@ -6,9 +6,11 @@ from Dataset import Dataset
 # Bayesian Classifier
 # First, we need to build the probability model
 
-d = Dataset("rec.sport.hockey.txt", "rec.sport.baseball.txt", cutoff=1000)
+d = Dataset("rec.sport.baseball.txt", 
+"rec.sport.hockey.txt", cutoff=1000)
+
 #d = Dataset("comp.sys.mac.hardware.txt", "comp.sys.ibm.pc.hardware.txt", cutoff=2000)
-(Xtrain, Ytrain, Xtest, Ytest) = d.getTrainAndTestSets(0.8, seed=1)
+(Xtrain, Ytrain, Xtest, Ytest) = d.getTrainAndTestSets(0.8, seed=5)
 wordlist = d.getWordList()
 
 def trainNaiveBayes(X, Y):
@@ -164,45 +166,11 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 25):
 
 # Pardon the repetition in this function...
 def runTests():
-  trainTotal = Ytrain.shape[0]
-  testTotal = Ytest.shape[0]
-  print "Training: Perception..."
-  (w, iterations) = perceptronTrain(Xtrain, Ytrain)
-  e = error(w,Xtrain, Ytrain, range(Xtrain.shape[1]))
-  print("Training error: " + str(e) + " of " + str(trainTotal))
-  e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
-  print("Test error: " + str(e) + " of " + str(testTotal))
-
-  print "\nTraining: Ridge Regression..."
-  w = ridgeTrain(Xtrain, Ytrain)
-  e = error(w,Xtrain, Ytrain, range(Xtrain.shape[1]))
-  print("Training error: " + str(e) + " of " + str(trainTotal))
-  e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
-  print("Test error: " + str(e) + " of " + str(testTotal))
-
-  print "\nTraining: Streamwise..."
-  (w,cols) = streamwiseTrain(Xtrain, Ytrain)
-  e = error(w, Xtrain, Ytrain, cols)
-  print("Training error: " + str(e) + " of " + str(trainTotal))
-  e = error(w, Xtest, Ytest, cols)
-  print("Test error: " + str(e) + " of " + str(testTotal))
-  print("Top ten columns selected:")
-  print([wordlist[c] for c in cols][:10])
-
-  print "\nTraining: Stepwise..."
-  (w,cols) = stepwiseTrain(Xtrain, Ytrain)
-  e = error(w, Xtrain, Ytrain, cols)
-  print("Training error: " + str(e) + " of " + str(trainTotal))
-  e = error(w, Xtest, Ytest, cols)
-  print("Test error: " + str(e) + " of " + str(testTotal))
-  print("Top ten columns selected:")
-  print([wordlist[c] for c in cols][:10])
-
   print("\nTraining: Bayes...")
   (probPos,probNeg) = trainNaiveBayes(Xtrain,Ytrain)
   (right,wrong) = naiveBayesClassify(probPos,probNeg,Xtest,Ytest)
-  print("Number Correct: " + right + "\n")
-  print("Number incorrect: " + wrong + "\n")
+  print("Number Correct: " + str(right) + "\n")
+  print("Number incorrect: " + str(wrong) + "\n")
 
 if __name__ == "__main__":
   runTests()

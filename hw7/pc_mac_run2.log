@@ -1,0 +1,32 @@
+Initializing new Dataset...
+	Smallest count after cutoff:  34
+Initialized dataset:
+	comp.sys.ibm.pc.hardware.txt vs. comp.sys.mac.hardware.txt
+	1000 words
+	1943 examples
+Generating random 80-20 split...
+Training: Perception...
+Training error: 7 of 1554
+Test error: 60 of 389
+
+Training: Ridge Regression...
+Training error: 24 of 1554
+Test error: 84 of 389
+
+Training: Streamwise...
+Training error: 156 of 1554
+Test error: 99 of 389
+Top ten columns selected:
+['fit', 'recent', 'again,', 'science', 'documentation', 'optional', 'one,', 'audio', 'motorola', '(like']
+
+Training: Stepwise...
+Training error: 246 of 1554
+Test error: 75 of 389
+Top ten columns selected:
+['the', 'mac', 'apple', 'i', 'centris', 'quadra', 'powerbook', 'iisi', 'lc', 'message']
+
+Training: Bayes...
+Number Correct: 288
+
+Number incorrect: 101
+
