@@ -1,16 +1,16 @@
 #!/usr/bin/python
 
+# CIS 521 Homework 7: Learning Machine Learning
+# Cory Rivera (rcor) and Sam Panzer (panzers)
+
 from numpy import *
 from Dataset import Dataset
 
-# Bayesian Classifier
-# First, we need to build the probability model
-
 d = Dataset("comp.sys.ibm.pc.hardware.txt", 
-"rec.sport.baseball.txt", cutoff=1000)
+"rec.sport.baseball.txt", cutoff=10)
 
 #d = Dataset("comp.sys.mac.hardware.txt", "comp.sys.ibm.pc.hardware.txt", cutoff=2000)
-(Xtrain, Ytrain, Xtest, Ytest) = d.getTrainAndTestSets(0.8, seed=5)
+(Xtrain, Ytrain, Xtest, Ytest) = d.getTrainAndTestSets(0.8, seed=1)
 wordlist = d.getWordList()
 
 def trainNaiveBayes(X, Y):
@@ -85,13 +85,16 @@ def naiveBayesClassify(probPos, probNeg, X, Y):
 
   return (right,wrong)
 
+# Ridge training is *easy*!
 def ridgeTrain(X, Y, l = 1):
-  Xt = matrix(X.T)
+  Xt = matrix(X.T) # shortand
   return linalg.inv(Xt * matrix(X) + l * identity(X.shape[1])) * Xt * matrix(Y)
 
+# Classify is useful for everything except Bayes.
 def classify(x, w):
   return sign(dot(w, x))
 
+# This is a pretty straightforward implementation of the pseudocode
 def perceptronTrain(X,Y, l = 1):
   w = random.rand(X.shape[1])
   perfect = False
@@ -110,6 +113,8 @@ def perceptronTrain(X,Y, l = 1):
   w = array([average(m[:,i]) for i in range(m.shape[1])])
   return (w, iterations)
 
+# This isn't actually used, since we have a much more intuitive
+# understanding of L0 error
 def l2Error(w,X,Y,columns, l):
    s1 = sum([linalg.norm(Y - dot(w.T,x)) for x in X[:,columns]])
    s2 = l * linalg.norm(w)
@@ -117,6 +122,7 @@ def l2Error(w,X,Y,columns, l):
    s3 = s1 + s2
    return s3
 
+# L0 error calculation: how many things are classified incorrectly?
 def error(w, X, Y, columns):
   X = X[:,columns]
   right = 0
@@ -129,6 +135,7 @@ def error(w, X, Y, columns):
       wrong += 1
   return wrong
 
+# A direct implementation of the suggestions in the homework
 def streamwiseTrain(X, Y, l = 1):
   cols = []
   w = zeros(X.shape[0])
@@ -140,9 +147,10 @@ def streamwiseTrain(X, Y, l = 1):
     if curr < e:
       cols = newCols
       e = curr
-
+  # We also need to know which columns were selected!
   return (ridgeTrain(X[:,cols],Y,l),cols)
 
+# As above, this is about as straightforward as they come.
 def stepwiseTrain(X, Y, l = 1, maxFeatures = 25):
   cols = []
   w = zeros(X.shape[0])
@@ -165,19 +173,49 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 25):
   return (ridgeTrain(X[:,cols],Y,l),cols)
 
 # Pardon the repetition in this function...
+# Eh, most of it's been deleted. But we stick the tests we actually want
+# to run here.
 def runTests():
-  print("\nTesting Data")
+  trainTotal = Ytrain.shape[0]
+  testTotal = Ytest.shape[0]
+  print "Training: Perception..."
+  (w, iterations) = perceptronTrain(Xtrain, Ytrain)
+  e = error(w,Xtrain, Ytrain, range(Xtrain.shape[1]))
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
+  print("Test error: " + str(e) + " of " + str(testTotal))
+
+  print "\nTraining: Ridge Regression..."
+  w = ridgeTrain(Xtrain, Ytrain)
+  e = error(w,Xtrain, Ytrain, range(Xtrain.shape[1]))
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w,Xtest, Ytest, range(Xtest.shape[1]))
+  print("Test error: " + str(e) + " of " + str(testTotal))
+
+  print "\nTraining: Streamwise..."
+  (w,cols) = streamwiseTrain(Xtrain, Ytrain)
+  e = error(w, Xtrain, Ytrain, cols)
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w, Xtest, Ytest, cols)
+  print("Test error: " + str(e) + " of " + str(testTotal))
+  print("Top ten columns selected:")
+  print([wordlist[c] for c in cols][:10])
+
+  print "\nTraining: Stepwise..."
+  (w,cols) = stepwiseTrain(Xtrain, Ytrain)
+  e = error(w, Xtrain, Ytrain, cols)
+  print("Training error: " + str(e) + " of " + str(trainTotal))
+  e = error(w, Xtest, Ytest, cols)
+  print("Test error: " + str(e) + " of " + str(testTotal))
+  print("Top ten columns selected:")
+  print([wordlist[c] for c in cols][:10])
+  print("\nTraining: Bayes...")
   (probPos,probNeg) = trainNaiveBayes(Xtrain,Ytrain)
-  (right,wrong) = naiveBayesClassify(probPos,probNeg,Xtest,Ytest)
-  print("Number Correct: " + str(right) + "\n")
-  print("Number incorrect: " + str(wrong) + "\n")
-
-  print("\nTraining Data")
   (right,wrong) = naiveBayesClassify(probPos,probNeg,Xtrain,Ytrain)
-  print("Number Correct: " + str(right) + "\n")
-  print("Number incorrect: " + str(wrong) + "\n")
+  print("Training Error: " + str(wrong) + " of " + str(trainTotal))
+  (right,wrong) = naiveBayesClassify(probPos,probNeg,Xtest,Ytest)
+  print("Testing Error: " + str(wrong) + " of " + str(testTotal))
 
-  
-
+# Oh, you want to run this from the shell? :D
 if __name__ == "__main__":
   runTests()
