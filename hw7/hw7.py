@@ -6,8 +6,8 @@ from Dataset import Dataset
 # Bayesian Classifier
 # First, we need to build the probability model
 
-d = Dataset("rec.sport.baseball.txt", 
-"rec.sport.hockey.txt", cutoff=1000)
+d = Dataset("comp.sys.ibm.pc.hardware.txt", 
+"rec.sport.baseball.txt", cutoff=1000)
 
 #d = Dataset("comp.sys.mac.hardware.txt", "comp.sys.ibm.pc.hardware.txt", cutoff=2000)
 (Xtrain, Ytrain, Xtest, Ytest) = d.getTrainAndTestSets(0.8, seed=5)
@@ -166,11 +166,18 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 25):
 
 # Pardon the repetition in this function...
 def runTests():
-  print("\nTraining: Bayes...")
+  print("\nTesting Data")
   (probPos,probNeg) = trainNaiveBayes(Xtrain,Ytrain)
   (right,wrong) = naiveBayesClassify(probPos,probNeg,Xtest,Ytest)
   print("Number Correct: " + str(right) + "\n")
   print("Number incorrect: " + str(wrong) + "\n")
+
+  print("\nTraining Data")
+  (right,wrong) = naiveBayesClassify(probPos,probNeg,Xtrain,Ytrain)
+  print("Number Correct: " + str(right) + "\n")
+  print("Number incorrect: " + str(wrong) + "\n")
+
+  
 
 if __name__ == "__main__":
   runTests()
