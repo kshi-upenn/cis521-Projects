@@ -61,10 +61,10 @@ def naiveBayesClassify(probPos, probNeg, X, Y):
     for j in range(X.shape[1]):
       if(X[i,j]):
         # Append prob to result
-        wordProb = wordProb + probRatio[j]
+        wordProb = wordProb + [probRatio[j]]
 
     avgRatio = sum(wordProb) / len(wordProb)
-    postProb = postProb + avgRatio
+    postProb = postProb + [avgRatio]
   
   globalRatio = sum(postProb) / len(postProb)
 
@@ -161,9 +161,9 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
 # e = error(w, Xtest, Ytest, cols)
 # print("Right: " + str(Ytest.shape[0] - e))
 # print("Wrong: " + str(e))
-#print(error(w,Xtrain, Ytrain, range(Xtrain.shape[1])))
+# print(error(w,Xtrain, Ytrain, range(Xtrain.shape[1])))
 # print("Right: " + str(right) + "; wrong: " + str(wrong))
 
 # Bayes Testing
 (probPos,probNeg) = trainNaiveBayes(Xtrain,Ytrain)
-print("Bayes - Most Likely Category: " + str(naiveBayesClassify(probPos,probNeg)))
+print("Bayes - Most Likely Category: " + str(naiveBayesClassify(probPos,probNeg,Xtest,Ytest)))
