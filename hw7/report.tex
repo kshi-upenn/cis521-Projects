@@ -1,0 +1,46 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\setcounter{secnumdepth}{0}
+\begin{document}
+\begin{center}
+  HW7: Cory Rivera (rcor) and Sam Panzer (panzers)
+\end{center}
+
+\subsection{1.}
+  When implementing the algorithms, we used $\lambda$ suggested in class, which was $1$.
+  We also ran a test using $\lambda$ values between $0.3$ and $1.5$ (increment of $0.2$), which pretty much showed that the value of $\lambda$ didn't change the results significantly:
+  the test errors had a range of less than $3$ for all cases except the Streamwise regression, which had a range of $14$ (the best result had $\lambda=1.1$.
+  Out of $399$ test cases, that's a difference of $3.5\%$, which might just have been statistical noise.
+
+  We chose a learning rate of $1$ for similar reasons, but didn't test it as extensively.
+
+  The maximum number of relevant words (for Stepwise and Streamwise) was set to 50.
+  We picked this by observing the number of words chosen before no improvement was detected, which rarely increased over 15 when we looked at only 100 relevant words.
+
+  As to the number of words, we stuck with 1000 because it was a suggested number in the homework. The algorithms improved as we increased the number of words from 20 to 100 to 500 to 1000, and doubling the size again took a prohibitively high amount of time.
+
+  We believe that these choices didn't affect the results too much, based on our experimentation (which was by far the most extensive in the value of $\lambda$). While paying attention to even more words would have increased our accuracy even further, it was not worth the extra time; the learning rate did not seem to change results too much either.
+
+\subsection{2}
+The PC-vs-Mac comparison was the most difficult. Just peeking at the newsgroups didn't make anything stand out, but we suspect it's becuase PC and Mac hardware are more similar than baseball and hockey are.
+Two sports differ more than two kinds of computers, especially when the sports have two different scoring models (periods vs. innings, goals vs. runs).
+Internally, computers are very similar - they have the same basic high- and low-level features.
+Another important point is that PC and Mac discussions tend to reference each other, while hockey discussions don't often involve comparisons with baseball.
+It's also possible that the two groups of people are more similar - those discussing computer hardware are probably a more homogeneous group than sports fans.
+
+\subsection{3}
+Here are the selections from no particular run:
+
+\begin{itemize}
+  \item PC-Mac: Streamwise: ['fit', 'recent', 'again,', 'science', 'documentation', 'optional', 'one,', 'audio', 'motorola', '(like']\\
+Stepwise: ['the', 'mac', 'apple', 'a', 'centris', 'quadra', 'powerbook', 'iisi', 'macs', 'pds']
+
+\item Hockey-Baseball: Streamwise: ['champions', 'kept', '68', 'lots', 'tommy', ')', 'claim', 'barry', 'lopez', 'pit-6']\\
+Stepwise: ['the', 'hockey', 'playoff', 'cup', 'nhl', 'wings', 'goal', 'in', 'winnipeg', 'penguins']
+
+\item PC-Baseball: Streamwise: ['individual', 'losing', 'experience', 'company', 'hold', 'includes', 'hell', 'totally', '1991', '1988']\\
+Stepwise: ['the', 'he', 'baseball', 'team', 'i', 'games', 'sox', 'system', 'article', 'mailing']
+\end{itemize}
+
+\end{document}
