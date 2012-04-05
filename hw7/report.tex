@@ -33,6 +33,10 @@ PC/Baseball & 14.8 & 4.4 & 46.4 & 10.8 & 54 & 79.2 & 56.4 & 160 & 59.2 & 177.8\\
 
   We believe that these choices didn't affect the results too much, based on our experimentation (which was by far the most extensive in the value of $\lambda$). While paying attention to even more words would have increased our accuracy even further, it was not worth the extra time; the learning rate did not seem to change results too much either.
 
+  Implementing Bayesian inference was actually quite challenging, since the traditional method broke down when applied to large data sets. Frequencies were often in the range of 1e-3,
+  and when multiplied together produced a number that was basically zero in floating point representation. Since we only care about whether one probability is higher than another, 
+  we just ratios between both categories and took an average of the frequencies (we only want to know which probability is strictly higher than the other).
+
 \subsection{2}
 The PC-vs-Mac comparison was the most difficult. Just peeking at the newsgroups didn't make anything stand out, but we suspect it's becuase PC and Mac hardware are more similar than baseball and hockey are.
 Two sports differ more than two kinds of computers, especially when the sports have two different scoring models (periods vs. innings, goals vs. runs).
@@ -53,5 +57,9 @@ Stepwise: the, hockey, playoff, cup, nhl, wings, goal, in, winnipeg, penguins
 \item PC-Baseball: Streamwise: individual, losing, experience, company, hold, includes, hell, totally, 1991, 1988\\
 Stepwise: the, he, baseball, team, i, games, sox, system, article, mailing
 \end{itemize}
+
+  These feature sets seem particularly useful because they often contains terms that are unique to either category. 
+  For example, the term 'sox' is exclusive to baseball, and 'nhl' erferrs to the National Hockey League (which is
+  unlikely to be mentioned in discussions of macbooks).
 
 \end{document}
