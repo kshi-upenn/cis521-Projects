@@ -7,6 +7,17 @@
   HW7: Cory Rivera (rcor) and Sam Panzer (panzers)
 \end{center}
 
+The results are in! (The ``Te'' columns are test runs, and ``Tr'' means training). The methods are abbreviated to the first letter for spacing (Stepwise and streamwise need three!).
+\vspace{1mm}
+
+\begin{tabular}{lcccccccccc}
+Comparison & P Te & P Tr & R Te & R Tr & Str Te & Str Tr & Stp Te & Stp Tr & B Te & B Tr\\
+Baseball/Hockey & 37.8 & 6.4 & 69 & 18.8 & 70.6 & 144.4 & 60.6 & 205.8 & 53.2 & 173.4\\
+PC/Mac & 65.4 & 6.4 & 91.8 & 25.4 & 99.4 & 157.2 & 75 & 250 & 100.6 & 317\\
+PC/Baseball & 14.8 & 4.4 & 46.4 & 10.8 & 54 & 79.2 & 56.4 & 160 & 59.2 & 177.8\\
+\end{tabular}
+
+
 \subsection{1.}
   When implementing the algorithms, we used $\lambda$ suggested in class, which was $1$.
   We also ran a test using $\lambda$ values between $0.3$ and $1.5$ (increment of $0.2$), which pretty much showed that the value of $\lambda$ didn't change the results significantly:
@@ -33,14 +44,14 @@ It's also possible that the two groups of people are more similar - those discus
 Here are the selections from no particular run:
 
 \begin{itemize}
-  \item PC-Mac: Streamwise: ['fit', 'recent', 'again,', 'science', 'documentation', 'optional', 'one,', 'audio', 'motorola', '(like']\\
-Stepwise: ['the', 'mac', 'apple', 'a', 'centris', 'quadra', 'powerbook', 'iisi', 'macs', 'pds']
+  \item PC-Mac: Streamwise: fit, recent, again,, science, documentation, optional, one, audio, motorola, (like\\
+Stepwise: the, mac, apple, a, centris, quadra, powerbook, iisi, macs, pds
 
-\item Hockey-Baseball: Streamwise: ['champions', 'kept', '68', 'lots', 'tommy', ')', 'claim', 'barry', 'lopez', 'pit-6']\\
-Stepwise: ['the', 'hockey', 'playoff', 'cup', 'nhl', 'wings', 'goal', 'in', 'winnipeg', 'penguins']
+\item Hockey-Baseball: Streamwise: champions, kept, 68, lots, tommy, ), claim, barry, lopez, pit-6\\
+Stepwise: the, hockey, playoff, cup, nhl, wings, goal, in, winnipeg, penguins
 
-\item PC-Baseball: Streamwise: ['individual', 'losing', 'experience', 'company', 'hold', 'includes', 'hell', 'totally', '1991', '1988']\\
-Stepwise: ['the', 'he', 'baseball', 'team', 'i', 'games', 'sox', 'system', 'article', 'mailing']
+\item PC-Baseball: Streamwise: individual, losing, experience, company, hold, includes, hell, totally, 1991, 1988\\
+Stepwise: the, he, baseball, team, i, games, sox, system, article, mailing
 \end{itemize}
 
 \end{document}
