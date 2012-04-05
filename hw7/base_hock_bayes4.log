@@ -6,8 +6,14 @@ Initialized dataset:
 	1993 examples
 Generating random 80-20 split...
 
-Training: Bayes...
+Testing Data
 Number Correct: 346
 
 Number incorrect: 53
+
+
+Training Data
+Number Correct: 1416
+
+Number incorrect: 178
 
