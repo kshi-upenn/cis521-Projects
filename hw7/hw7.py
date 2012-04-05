@@ -52,7 +52,7 @@ def trainNaiveBayes(X, Y):
 def naiveBayesClassify(probPos, probNeg, X, Y):
   probRatio = array([ probPos[i] / probNeg[i] for i in range(probPos.shape[0]) ])
 
-  # Prbabilties for each post
+  # Probabilties for each post
   postProb = []
   for i in range(X.shape[0]):
     # Probabilities for individual words in this post
@@ -65,13 +65,23 @@ def naiveBayesClassify(probPos, probNeg, X, Y):
 
     avgRatio = sum(wordProb) / len(wordProb)
     postProb = postProb + [avgRatio]
-  
-  globalRatio = sum(postProb) / len(postProb)
 
-  if(globalRatio > 1.0):
-    return 1;
+  estimates = []
+  for i in range(len(postProb)):
+    if(postProb[i] > 1.0):
+      estimates = estimates + [1]
+    else:
+      estimates = estimates + [-1]
 
-  return -1
+  right = 0
+  wrong = 0
+  for i in range(Y.shape[0]):
+    if(estimates[i] == Y[i]):
+      right += 1
+    else:
+      wrong += 1
+
+  return (right,wrong)
 
 def ridgeTrain(X, Y, l = 1):
   Xt = matrix(X.T)
@@ -166,4 +176,4 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
 
 # Bayes Testing
 (probPos,probNeg) = trainNaiveBayes(Xtrain,Ytrain)
-print("Bayes - Most Likely Category: " + str(naiveBayesClassify(probPos,probNeg,Xtest,Ytest)))
+(right,wrong) = naiveBayesClassify(probPos,probNeg,Xtest,Ytest)
