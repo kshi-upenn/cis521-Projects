@@ -47,15 +47,29 @@ def trainNaiveBayes(X, Y):
 
   # The numbers are so small that products become impossible, so we can just
   # keep track of the ratios
-  probRatio = array([ probPos[i] / probNeg[i] for i in range(probPos.shape[0]) ]) 
+  return (probPos,probNeg)
 
-  return probRatio
+def naiveBayesClassify(probPos, probNeg, X, Y):
+  probRatio = array([ probPos[i] / probNeg[i] for i in range(probPos.shape[0]) ])
 
-def naiveBayesClassify(probRatio):
-  avgRatio = sum(probRatio) / probRatio.shape[0]
+  # Prbabilties for each post
+  postProb = []
+  for i in range(X.shape[0]):
+    # Probabilities for individual words in this post
+    wordProb = []
 
-  if(avgRatio > 1.0):
-    return 1
+    for j in range(X.shape[1]):
+      if(X[i,j]):
+        # Append prob to result
+        wordProb = wordProb + probRatio[j]
+
+    avgRatio = sum(wordProb) / len(wordProb)
+    postProb = postProb + avgRatio
+  
+  globalRatio = sum(postProb) / len(postProb)
+
+  if(globalRatio > 1.0):
+    return 1;
 
   return -1
 
@@ -151,5 +165,5 @@ def stepwiseTrain(X, Y, l = 1, maxFeatures = 10):
 # print("Right: " + str(right) + "; wrong: " + str(wrong))
 
 # Bayes Testing
-prob = trainNaiveBayes(Xtrain,Ytrain)
-print("Bayes - Most Likely Category: " + str(naiveBayesClassify(prob)))
+(probPos,probNeg) = trainNaiveBayes(Xtrain,Ytrain)
+print("Bayes - Most Likely Category: " + str(naiveBayesClassify(probPos,probNeg)))
