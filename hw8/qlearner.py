@@ -11,20 +11,20 @@ from src.state import GlobalState
 from valuebot import ValueBot
 import random
 
+# Two parameters that controll exploration
+explore_start = 15
+explore_stop = 30
+def max_by(source, evaluator):
+  best = None
+  bestVal = None
+  for x in source:
+    v = evaluator(x)
+    if (best == None) or bestVal < v:
+      best = x
+      bestVal = v
+  return (bestVal, best)
+
 class QLearnBot(ValueBot):
-    explore_start = 15
-    explore_stop = 30
-    def maxBy(source, evaluator):
-      best = None
-      bestVal = None
-      for x in source:
-        v = evaluator(x)
-        if (best == None) or bestVal < v:
-          best = x
-          bestVal = v
-      return best
-
-
     def __init__(self,world, load_file="save_bots/qbot.json"):
         ValueBot.__init__(self,world, load_file)
         self.ngame = 0
@@ -91,7 +91,7 @@ class QLearnBot(ValueBot):
             weight update rule described in the homework handout.
         """
         for i in range(len(self.weights)):
-            self.weights[i] += alpha * (reward + discount * maxval - prevval) * features(i)
+            self.weights[i] += alpha * (reward + discount * maxval - prevval) * features[i]
         
 
     def explore_and_exploit(self,ant):
@@ -119,7 +119,7 @@ class QLearnBot(ValueBot):
         # step size.  it's good to make this inversely proportional to the
         # number of features, so you don't bounce out of the bowl we're trying
         # to descend via gradient descent
-        alpha = 5.0 / (len(self.features))
+        alpha = 5.0 / (len(self.features.to_dict()))
         
         # totally greedy default value, future rewards count for nothing, do not want
         discount = 1.0
@@ -127,10 +127,9 @@ class QLearnBot(ValueBot):
         # should be max_a' Q(s',a'), where right now we are in state s' and the
         # previous state was s.  You can use
         # self.value(self.state,ant.location,action) here
-        max_next_value = 0 
-        
-        # should be argmax_a' Q(s',a')
-        max_next_action = 'halt'
+
+        # SO WHY NOT JUST PUT THAT IN THE CODE INSTEAD OF LEAVING A CRYPTIC COMMENT!?
+        (max_next_value, max_next_action) = max_by(actions, lambda x: self.value(self.state,ant.location,x))
         
         # now that we have all the quantities needed, adjust the weights
         self.update_weights(alpha,discount,R,max_next_value,ant.prev_value,ant.prev_features)
@@ -158,7 +157,7 @@ BOT = ValueBot
 
 if __name__ == '__main__':
     from src.localengine import LocalEngine
-    from sample_bots.greedybot import GreedyBot
+    from greedybot import GreedyBot
     import sys
     import time
 
@@ -171,8 +170,8 @@ if __name__ == '__main__':
     game_number = int(sys.argv[1])
     
 #    PLAY_TYPE = 'step'
-#    PLAY_TYPE = 'batch'
-    PLAY_TYPE = 'play'
+    PLAY_TYPE = 'batch'
+    #PLAY_TYPE = 'play'
 
     # Run the local debugger
     engine = LocalEngine(game=None)
