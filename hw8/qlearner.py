@@ -36,10 +36,10 @@ class QLearnBot(ValueBot):
             reward_state.death_dealt: Fraction of responsibility this ant contributed to killing other ants (e.g., if 2 ants killed an enemy an, each would have death_dealt=1/2
         """
 
-        '''
-        YOUR CODE HERE
-        '''
-        reward = 1337
+        food_reward = 2.0 * (reward_state.food_eaten + 0.1)
+        killer_reward = 0.1 * reward_state.was_killed
+        death_reward = (-1) if reward_state.death_dealt else 0.25
+        reward = food_reward + killer_reward + death_reward;
         return reward
     
     def avoid_collisions(self):
@@ -87,11 +87,9 @@ class QLearnBot(ValueBot):
         """
             Perform an update of the weights here according to the Q-learning
             weight update rule described in the homework handout.
-
-            YOUR CODE HERE
         """
         for i in range(len(self.weights)):
-            self.weights[i] += 0xdeadbeef
+            self.weights[i] += alpha * (reward + discount * maxval - prevval) * features(i)
         
 
     def explore_and_exploit(self,ant):
@@ -119,10 +117,10 @@ class QLearnBot(ValueBot):
         # step size.  it's good to make this inversely proportional to the
         # number of features, so you don't bounce out of the bowl we're trying
         # to descend via gradient descent
-        alpha = 1.0
+        alpha = 1.0 / (len(self.features))
         
         # totally greedy default value, future rewards count for nothing, do not want
-        discount = 0.0 
+        discount = 1.0
         
         # should be max_a' Q(s',a'), where right now we are in state s' and the
         # previous state was s.  You can use
