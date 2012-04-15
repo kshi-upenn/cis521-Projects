@@ -12,6 +12,8 @@ from valuebot import ValueBot
 import random
 
 class QLearnBot(ValueBot):
+    explore_start = 15
+    explore_stop = 30
     def maxBy(source, evaluator):
       best = None
       bestVal = None
@@ -117,7 +119,7 @@ class QLearnBot(ValueBot):
         # step size.  it's good to make this inversely proportional to the
         # number of features, so you don't bounce out of the bowl we're trying
         # to descend via gradient descent
-        alpha = 1.0 / (len(self.features))
+        alpha = 5.0 / (len(self.features))
         
         # totally greedy default value, future rewards count for nothing, do not want
         discount = 1.0
@@ -136,7 +138,15 @@ class QLearnBot(ValueBot):
                 
         # step 2, explore or exploit? you should replace decide_to_explore with
         # something sensible based on the number of games played so far, self.ngames
-        decide_to_explore = True
+        decide_to_explore = None 
+        if self.ngames < explore_start:
+          decide_to_explore = True
+        elif self.ngames < explore_stop:
+          p = 1.0 * (explore_stop - self.ngames) / (explore_stop - explore_start)
+          decide_to_explore = random.random() < p
+        else:
+          decide_to_explore = False
+
         if decide_to_explore:
             return actions[0]
         else:      
