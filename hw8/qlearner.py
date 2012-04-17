@@ -38,10 +38,10 @@ class QLearnBot(ValueBot):
             reward_state.death_dealt: Fraction of responsibility this ant contributed to killing other ants (e.g., if 2 ants killed an enemy an, each would have death_dealt=1/2
         """
 
-        food_reward = 2.0 * (reward_state.food_eaten + 0.1)
-        killer_reward = 0.1 * reward_state.was_killed
-        death_reward = (-1) if reward_state.death_dealt else 0.25
-        reward = food_reward + killer_reward + death_reward;
+        food_reward = 3 * (reward_state.food_eaten)
+        killer_reward = 0.3 * reward_state.death_dealt
+        death_reward = (-0.5) * reward_state.was_killed
+        reward = food_reward + killer_reward + death_reward
         return reward
     
     def avoid_collisions(self):
@@ -90,8 +90,11 @@ class QLearnBot(ValueBot):
             Perform an update of the weights here according to the Q-learning
             weight update rule described in the homework handout.
         """
+        print("weights:")
         for i in range(len(self.weights)):
             self.weights[i] += alpha * (reward + discount * maxval - prevval) * features[i]
+            #if self.weights[i]:
+              #print(str(i) + ": " + str(self.weights[i]))
         
 
     def explore_and_exploit(self,ant):
@@ -119,7 +122,7 @@ class QLearnBot(ValueBot):
         # step size.  it's good to make this inversely proportional to the
         # number of features, so you don't bounce out of the bowl we're trying
         # to descend via gradient descent
-        alpha = 5.0 / (len(self.features.to_dict()))
+        alpha = 0.01 / (len(self.weights))
         
         # totally greedy default value, future rewards count for nothing, do not want
         discount = 1.0
@@ -169,7 +172,7 @@ if __name__ == '__main__':
         sys.exit()
     game_number = int(sys.argv[1])
     
-#    PLAY_TYPE = 'step'
+    #PLAY_TYPE = 'step'
     PLAY_TYPE = 'batch'
     #PLAY_TYPE = 'play'
 
