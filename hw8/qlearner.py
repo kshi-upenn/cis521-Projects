@@ -174,7 +174,7 @@ if __name__ == '__main__':
     
     #PLAY_TYPE = 'step'
     PLAY_TYPE = 'batch'
-    PLAY_TYPE = 'play'
+    #PLAY_TYPE = 'play'
 
     # Run the local debugger
     engine = LocalEngine(game=None)
