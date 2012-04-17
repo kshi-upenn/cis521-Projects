@@ -38,9 +38,9 @@ class QLearnBot(ValueBot):
             reward_state.death_dealt: Fraction of responsibility this ant contributed to killing other ants (e.g., if 2 ants killed an enemy an, each would have death_dealt=1/2
         """
 
-        food_reward = 3 * (reward_state.food_eaten)
+        food_reward = 2.0 * (reward_state.food_eaten)
         killer_reward = 0.3 * reward_state.death_dealt
-        death_reward = (-0.5) * reward_state.was_killed
+        death_reward = (-0.8) * reward_state.was_killed
         reward = food_reward + killer_reward + death_reward
         return reward
     
