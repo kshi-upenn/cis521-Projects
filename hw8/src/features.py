@@ -100,6 +100,8 @@ class BasicFeatures(FeatureExtractor):
         self.feature_names.append("Closest enemy 4 away")
         self.feature_names.append("Closest enemy >4 away")
 
+        self.feature_names.append("Number of Nearby Friendly Ants")    
+
     def __init__(self):
         FeatureExtractor.__init__(self, {'_type': BasicFeatures.type_name})    
                 
@@ -119,13 +121,17 @@ class BasicFeatures(FeatureExtractor):
             return locs[0][1]
         else:
             return None
-        
+    
+    def num_nearby_ants(self, friendly_points):
+      return len(friendly_points)
+
     def extract(self, world, state, loc, action):
         """Extract the three simple features."""
         
         food_loc = self.find_closest(world, loc, state.lookup_nearby_food(loc))
         enemy_loc = self.find_closest(world, loc, state.lookup_nearby_enemy(loc))
         friend_loc = self.find_closest(world, loc, state.lookup_nearby_friendly(loc))
+        num_friends = self.num_nearby_ants(state.lookup_nearby_friendlyloc))
 
         next_loc = world.next_position(loc, action)
         world.L.debug("loc: %s, food_loc: %s, enemy_loc: %s, friendly_loc: %s" % (str(loc), str(food_loc), str(enemy_loc), str(friend_loc)))
@@ -173,7 +179,13 @@ class BasicFeatures(FeatureExtractor):
             for k in range(1,5):
                 f.append(d_enemy == k)
             f.append(d_enemy > 4)
-        
+
+        # number of close friendlies
+        if friend_loc is None:
+          f.append(False)
+        else:
+          f.append(num_friends)
+
         return f
     
 class QualifyingFeatures(FeatureExtractor):
