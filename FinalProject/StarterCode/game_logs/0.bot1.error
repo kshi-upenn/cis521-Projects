@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "./rungame.py", line 37, in <module>
+    bot = bots[0](AntWorld())
+IndexError: list index out of range
+turn    0 bot 1 crashed
