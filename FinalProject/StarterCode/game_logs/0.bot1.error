@@ -1,5 +1,7 @@
 Traceback (most recent call last):
-  File "./rungame.py", line 37, in <module>
-    bot = bots[0](AntWorld())
-IndexError: list index out of range
+  File "rungame.py", line 23, in <module>
+    bots = [__import__(botstr[:-3]).BOT for botstr in botlist]
+  File "/home/sam/Documents/CIS 521/cis521-Projects/FinalProject/StarterCode/GreedyImproved.py", line 3, in <module>
+    from ants import *
+ImportError: No module named ants
 turn    0 bot 1 crashed
